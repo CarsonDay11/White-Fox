@@ -2,6 +2,8 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtGui import QIcon
+import requests
 
 class Browser(QMainWindow):
     def __init__(self):
@@ -57,6 +59,9 @@ class Browser(QMainWindow):
         self.settings = QSettings("MyCompany", "MyBrowser")
         self.home_url = self.settings.value("home_url", "http://www.google.com")
 
+        # Check for updates
+        self.check_for_updates()
+
     def navigate_home(self):
         self.browser.setUrl(QUrl(self.home_url))
 
@@ -74,6 +79,19 @@ class Browser(QMainWindow):
     def open_settings(self):
         dialog = SettingsDialog(self)
         dialog.exec_()
+
+    def check_for_updates(self):
+        repo_url = "https://api.github.com/repos/CarsonDay11/Car-browser/commits"
+        response = requests.get(repo_url)
+
+        if response.status_code == 200:
+            latest_commit = response.json()[0]
+            commit_message = latest_commit['commit']['message']
+            self.show_update_notification(commit_message)
+
+    def show_update_notification(self, message):
+        notification = QSystemTrayIcon()
+        notification.showMessage("Update Available", f"A new update is available for Car Browser!\n{message}", QSystemTrayIcon.Information, 5000)
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):

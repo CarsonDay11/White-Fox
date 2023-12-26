@@ -1,3 +1,4 @@
+# A simple browser made using sys and PyQt5! More updates coming soon.
 import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *

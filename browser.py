@@ -9,6 +9,9 @@ os.environ['QTWEBENGINE_CHROMIUM_FLAGS'] = '--disable-web-security'
 class Browser(QMainWindow):
     def __init__(self):
         super().__init__()
+        icon_path = os.path.join(os.path.dirname(__file__), 'icon.ico')
+        self.setWindowIcon(QIcon(icon_path))
+
         self.browser = QWebEngineView()
         self.browser.setUrl(QUrl("https://car-browser.vercel.app/"))
         self.setCentralWidget(self.browser)
@@ -39,14 +42,6 @@ class Browser(QMainWindow):
 
         self.browser.urlChanged.connect(self.update_urlbar)
 
-        self.theme_combobox = QComboBox()
-        self.theme_combobox.addItems(["Light Theme", "Dark Theme"])
-        self.theme_combobox.setCurrentText("Light Theme")
-        self.theme_combobox.currentIndexChanged.connect(self.apply_theme)
-        navbar.addWidget(self.theme_combobox)
-
-        self.apply_theme()
-
         settings_action = QAction('Settings', self)
         settings_action.triggered.connect(self.open_settings)
         navbar.addAction(settings_action)
@@ -68,13 +63,6 @@ class Browser(QMainWindow):
         self.url_bar.setText(q.toString())
         self.url_bar.setCursorPosition(0)
 
-    def apply_theme(self):
-        theme = self.theme_combobox.currentText()
-        if theme == "Dark Theme":
-            self.setStyleSheet("QMainWindow{background-color: #333; color: #FFF;}")
-        else:
-            self.setStyleSheet("QMainWindow{background-color: #FFF; color: #000;}")
-
     def open_settings(self):
         dialog = SettingsDialog(self)
         dialog.exec_()
@@ -88,19 +76,12 @@ class SettingsDialog(QDialog):
         self.home_edit = QLineEdit(self.parent().home_url)
         self.home_edit.setPlaceholderText('Enter the home page URL')
 
-        self.theme_label = QLabel('Select Theme:')
-        self.theme_combobox = QComboBox()
-        self.theme_combobox.addItems(["Light Theme", "Dark Theme"])
-        self.theme_combobox.setCurrentText("Light Theme")
-
         self.save_button = QPushButton('Save')
         self.save_button.clicked.connect(self.save_settings)
 
         layout = QVBoxLayout()
         layout.addWidget(self.home_label)
         layout.addWidget(self.home_edit)
-        layout.addWidget(self.theme_label)
-        layout.addWidget(self.theme_combobox)
         layout.addWidget(self.save_button)
 
         self.setLayout(layout)
@@ -110,14 +91,10 @@ class SettingsDialog(QDialog):
         self.parent().home_url = home_url
         self.parent().settings.setValue("home_url", home_url)
 
-        selected_theme = self.theme_combobox.currentText()
-        self.parent().settings.setValue("theme", selected_theme)
-        self.parent().apply_theme()
-
         self.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    QApplication.setApplicationName("Car Browser")
+    QApplication.setApplicationName("White Fox")
     window = Browser()
     app.exec_()
